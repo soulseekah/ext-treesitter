@@ -1,8 +1,22 @@
 --TEST--
-Tree sitter: Experimental JSON test
+Tree-sitter: Check registered Grammar constants
 --FILE--
 <?php
-	echo test1();
+	echo implode(PHP_EOL, array_map(fn($id) => hex2bin(dechex($id)), [
+		TreeSitter\Grammar::PHP,
+		TreeSitter\Grammar::HTML,
+		TreeSitter\Grammar::CSS,
+		TreeSitter\Grammar::JAVASCRIPT,
+		TreeSitter\Grammar::TYPESCRIPT,
+		TreeSitter\Grammar::PYTHON,
+		TreeSitter\Grammar::JSON,
+	]));
 ?>
 --EXPECT--
-Syntax tree: (document (array (number) (null)))
+php
+html
+css
+js
+ts
+python
+json

@@ -4,7 +4,6 @@ TS_CFLAGS="$TS_CFLAGS -Ilib/tree-sitter/lib/include/ -Ilib/tree-sitter/lib/src/"
 
 TS_PARSERS="$TS_PARSERS lib/parsers/tree-sitter-php/php/src/parser.c lib/parsers/tree-sitter-php/php/src/scanner.c"
 TS_CFLAGS="$TS_CFLAGS -Ilib/parsers/tree-sitter-php/php/src/"
-
 TS_PARSERS="$TS_PARSERS lib/parsers/tree-sitter-html/src/parser.c lib/parsers/tree-sitter-html/src/scanner.c"
 TS_PARSERS="$TS_PARSERS lib/parsers/tree-sitter-css/src/parser.c lib/parsers/tree-sitter-css/src/scanner.c"
 TS_PARSERS="$TS_PARSERS lib/parsers/tree-sitter-javascript/src/parser.c lib/parsers/tree-sitter-javascript/src/scanner.c"
