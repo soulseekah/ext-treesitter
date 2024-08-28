@@ -28,3 +28,5 @@ tests/*.out
 tests/*.sh
 tests/*.php
 php_test_results_*.txt
+gen_stub.php
+PHP-Parser-5.0.0

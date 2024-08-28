@@ -10,7 +10,14 @@ Tree-sitter: Check registered Grammar constants
 		TreeSitter\Grammar::TYPESCRIPT,
 		TreeSitter\Grammar::PYTHON,
 		TreeSitter\Grammar::JSON,
-	]));
+	])) . PHP_EOL;
+
+	try {
+		new TreeSitter\Grammar;
+		echo '__SENTINEL__';
+	} catch (Error $e) {
+		echo $e->getMessage();
+	}
 ?>
 --EXPECT--
 php
@@ -20,3 +27,4 @@ js
 ts
 python
 json
+TreeSitter\Grammar class is non-instantiable

@@ -1,16 +1,19 @@
 #include "php.h"
 #include "ext/standard/info.h"
 
-#include "php_treesitter.h"
-#include "treesitter_arginfo.h"
-
 #include "tree_sitter/api.h"
 
+#include "php_treesitter.h"
 #include "lib/parsers/parsers.h"
+#include "treesitter_arginfo.h"
 
 static zend_class_entry *php_treesitter_grammar_ce = NULL;
 static zend_object_handlers php_treesitter_grammar_handlers;
 static zend_object *php_treesitter_grammar_object = NULL;
+
+static zend_class_entry *php_treesitter_parser_ce = NULL;
+static zend_object_handlers php_treesitter_parser_handlers;
+static zend_object *php_treesitter_parser_object = NULL;
 
 static zend_object *php_treesitter_grammar_object_create(zend_class_entry *ce)
 {
@@ -21,12 +24,6 @@ static zend_object *php_treesitter_grammar_object_create(zend_class_entry *ce)
     php_treesitter_grammar_object->handlers = &php_treesitter_grammar_handlers;
 
     return php_treesitter_grammar_object;
-}
-
-static zend_function *php_treesitter_grammar_object_get_constructor(zend_object *object)
-{
-    zend_throw_error(NULL, "TreeSitter\\Grammar class is non-instantiable");
-    return NULL;
 }
 
 PHP_FUNCTION(test1)
@@ -73,6 +70,33 @@ PHP_FUNCTION(test1)
     ts_parser_delete(parser);
 }
 
+ZEND_METHOD(TreeSitter_Grammar, __construct)
+{
+    zend_throw_error(NULL, "%s class is non-instantiable", ZSTR_VAL(Z_OBJCE_P(ZEND_THIS)->name));
+	RETURN_THROWS();
+}
+
+ZEND_METHOD(TreeSitter_Parser, __construct)
+{
+	zval *grammar;
+
+	ZEND_PARSE_PARAMETERS_START(1, 1)
+		Z_PARAM_NUMBER(grammar)
+	ZEND_PARSE_PARAMETERS_END();
+
+	switch (Z_LVAL_P(grammar)) {
+		case PHP_TREESITTER_GRAMMAR_JSON:
+			break;
+		default:
+			zend_throw_error(NULL, "Unknown grammar");
+			RETURN_THROWS();
+	}
+}
+
+ZEND_METHOD(TreeSitter_Parser, parse)
+{
+}
+
 PHP_MINIT_FUNCTION(treesitter)
 {
 	php_treesitter_grammar_ce = register_class_TreeSitter_Grammar();
@@ -80,7 +104,10 @@ PHP_MINIT_FUNCTION(treesitter)
 
 	memcpy(&php_treesitter_grammar_handlers, &std_object_handlers, sizeof(zend_object_handlers));
     php_treesitter_grammar_handlers.clone_obj = NULL;
-    php_treesitter_grammar_handlers.get_constructor = php_treesitter_grammar_object_get_constructor;
+
+	php_treesitter_parser_ce = register_class_TreeSitter_Parser();
+
+	memcpy(&php_treesitter_grammar_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 
     return SUCCESS;
 }

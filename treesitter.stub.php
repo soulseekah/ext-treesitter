@@ -3,42 +3,70 @@
 /** @generate-class-entries */
 
 namespace TreeSitter {
-
+	/**
+	 * @strict-properties
+	 * @not-serializable
+	 */
 	final class Grammar {
 		/**
-		 * @var int
+		 * @cvalue PHP_TREESITTER_GRAMMAR_PHP
 		 */
-		const PHP = 0x706870;
+		public const int PHP = UNKNOWN;
 
 		/**
-		 * @var int
+		 * @cvalue PHP_TREESITTER_GRAMMAR_HTML
 		 */
-		const HTML = 0x68746d6c;
+		public const int HTML = UNKNOWN;
 
 		/**
-		 * @var int
+		 * @cvalue PHP_TREESITTER_GRAMMAR_CSS
 		 */
-		const CSS = 0x637373;
+		public const int CSS = UNKNOWN;
 
 		/**
-		 * @var int
+		 * @cvalue PHP_TREESITTER_GRAMMAR_JAVASCRIPT
 		 */
-		const JAVASCRIPT = 0x6a73;
+		public const int JAVASCRIPT = UNKNOWN;
 
 		/**
-		 * @var int
+		 * @cvalue PHP_TREESITTER_GRAMMAR_TYPESCRIPT
 		 */
-		const TYPESCRIPT = 0x7473;
+		public const int TYPESCRIPT = UNKNOWN;
 
 		/**
-		 * @var int
+		 * @cvalue PHP_TREESITTER_GRAMMAR_PYTHON
 		 */
-		const PYTHON = 0x707974686f6e;
+		public const int PYTHON = UNKNOWN;
 
 		/**
-		 * @var int
+		 * @cvalue PHP_TREESITTER_GRAMMAR_JSON
 		 */
-		const JSON = 0x6a736f6e;
+		public const int JSON = UNKNOWN;
+
+		public function __construct() {}
 	}
 
+	/**
+	 * @strict-properties
+	 * @not-serializable
+	 */
+	class Parser {
+		public function __construct() {}
+
+		public function parse(string $source_code): Tree {}
+	}
+
+	/**
+	 * @strict-properties
+	 * @not-serializable
+	 */
+	class Tree {
+	}
+
+	/**
+	 * @strict-properties
+	 * @not-serializable
+	 */
+	class Node {
+	}
 }
