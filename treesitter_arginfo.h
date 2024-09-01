@@ -1,10 +1,12 @@
 /* This is a generated file, edit the .stub.php file instead.
- * Stub hash: 9851e3f9ff7b248bebe220363c5e852dd0a101f2 */
+ * Stub hash: aef0141b733f4fdc5f965fd9d128c52a10d3efa8 */
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_TreeSitter_Grammar___construct, 0, 0, 0)
 ZEND_END_ARG_INFO()
 
-#define arginfo_class_TreeSitter_Parser___construct arginfo_class_TreeSitter_Grammar___construct
+ZEND_BEGIN_ARG_INFO_EX(arginfo_class_TreeSitter_Parser___construct, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, grammar, IS_LONG, 0)
+ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_class_TreeSitter_Parser_parse, 0, 1, TreeSitter\\Tree, 0)
 	ZEND_ARG_TYPE_INFO(0, source_code, IS_STRING, 0)

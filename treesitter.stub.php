@@ -51,7 +51,7 @@ namespace TreeSitter {
 	 * @not-serializable
 	 */
 	class Parser {
-		public function __construct() {}
+		public function __construct(int $grammar) {}
 
 		public function parse(string $source_code): Tree {}
 	}

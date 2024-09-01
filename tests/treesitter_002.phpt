@@ -3,8 +3,7 @@ Tree-sitter: Simple JSON __toString
 --FILE--
 <?php
 	$parser = new TreeSitter\Parser(TreeSitter\Grammar::JSON);
-	var_dump($parser);
-	$tree = $parser->parse();
+	$tree = $parser->parse("[1, null]");
 	var_dump($tree);
 	// $rootNode = $tree->getRootNode();
 	// echo $rootNode;

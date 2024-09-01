@@ -2,7 +2,7 @@
 Tree-sitter: Check registered Grammar constants
 --FILE--
 <?php
-	echo implode(PHP_EOL, array_map(fn($id) => hex2bin(dechex($id)), [
+	echo implode(PHP_EOL, array_map(fn($id) => hex2bin(dechex($id)), $grammars = [
 		TreeSitter\Grammar::PHP,
 		TreeSitter\Grammar::HTML,
 		TreeSitter\Grammar::CSS,
@@ -17,6 +17,10 @@ Tree-sitter: Check registered Grammar constants
 		echo '__SENTINEL__';
 	} catch (Error $e) {
 		echo $e->getMessage();
+	}
+
+	foreach ($grammars as $grammar) {
+		new TreeSitter\Parser($grammar);
 	}
 ?>
 --EXPECT--

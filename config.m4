@@ -1,5 +1,7 @@
 AC_DEFINE(HAVE_TREESITTER, 1, [ Have treesitter ])
 
+TS_FLAGS="-O0"
+
 TS_CFLAGS="$TS_CFLAGS -Ilib/tree-sitter/lib/include/ -Ilib/tree-sitter/lib/src/"
 
 TS_PARSERS="$TS_PARSERS lib/parsers/tree-sitter-php/php/src/parser.c lib/parsers/tree-sitter-php/php/src/scanner.c"
