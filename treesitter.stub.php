@@ -61,6 +61,7 @@ namespace TreeSitter {
 	 * @not-serializable
 	 */
 	class Tree {
+		public function getRootNode(): Node {}
 	}
 
 	/**
@@ -68,5 +69,6 @@ namespace TreeSitter {
 	 * @not-serializable
 	 */
 	class Node {
+		public function __toString(): string {}
 	}
 }

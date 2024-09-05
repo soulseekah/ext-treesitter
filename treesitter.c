@@ -1,6 +1,3 @@
-#include "php.h"
-#include "ext/standard/info.h"
-
 #include "tree_sitter/api.h"
 
 #include "php_treesitter.h"
@@ -8,26 +5,7 @@
 #include "treesitter_arginfo.h"
 
 static zend_class_entry *php_treesitter_grammar_ce = NULL;
-static zend_class_entry *php_treesitter_parser_ce = NULL;
-static zend_class_entry *php_treesitter_tree_ce = NULL;
-static zend_class_entry *php_treesitter_node_ce = NULL;
-
 static zend_object_handlers php_treesitter_grammar_handlers;
-static zend_object_handlers php_treesitter_parser_handlers;
-static zend_object_handlers php_treesitter_tree_handlers;
-static zend_object_handlers php_treesitter_node_handlers;
-
-typedef struct {
-    int _; // TODO: remove, experimental
-    TSParser *parser;
-    int __; // TODO: remove, experimental
-    const TSLanguage *grammar;
-    zend_object std;
-} php_treesitter_parser_object;
-
-static inline php_treesitter_parser_object *php_treesitter_parser_object_from_zend_object(zend_object *obj) {
-    return (php_treesitter_parser_object *)((char *)obj - XtOffsetOf(php_treesitter_parser_object, std));
-}
 
 static zend_object *php_treesitter_grammar_object_create(zend_class_entry *ce)
 {
@@ -38,6 +16,103 @@ static zend_object *php_treesitter_grammar_object_create(zend_class_entry *ce)
     php_treesitter_grammar_object->handlers = &php_treesitter_grammar_handlers;
 
     return php_treesitter_grammar_object;
+}
+
+ZEND_METHOD(TreeSitter_Grammar, __construct)
+{
+    zend_throw_error(NULL, "%s class is non-instantiable", ZSTR_VAL(Z_OBJCE_P(ZEND_THIS)->name));
+    RETURN_THROWS();
+}
+
+static zend_class_entry *php_treesitter_node_ce = NULL;
+static zend_object_handlers php_treesitter_node_handlers;
+
+typedef struct {
+    TSNode node;
+    zend_object std;
+} php_treesitter_node_object;
+
+static inline php_treesitter_node_object *php_treesitter_node_object_from_zend_object(zend_object *obj) {
+    return (php_treesitter_node_object *)((char *)obj - XtOffsetOf(php_treesitter_node_object, std));
+}
+
+static zend_object *php_treesitter_node_object_create(zend_class_entry *ce)
+{
+    php_treesitter_node_object *obj = zend_object_alloc(sizeof(php_treesitter_node_object), ce);
+
+    zend_object_std_init(&obj->std, ce);
+    object_properties_init(&obj->std, ce);
+
+    return &obj->std;
+}
+
+ZEND_METHOD(TreeSitter_Node, __construct)
+{
+    zend_throw_error(NULL, "%s class is non-instantiable", ZSTR_VAL(Z_OBJCE_P(ZEND_THIS)->name));
+    RETURN_THROWS();
+}
+
+ZEND_METHOD(TreeSitter_Node, __toString)
+{
+    php_treesitter_node_object *node = php_treesitter_node_object_from_zend_object(Z_OBJ_P(ZEND_THIS));
+
+    char *string = ts_node_string(node->node);
+
+    zend_string *return_string = zend_string_init(string, strlen(string), 0);
+    RETURN_NEW_STR(return_string);
+}
+
+static zend_class_entry *php_treesitter_tree_ce = NULL;
+static zend_object_handlers php_treesitter_tree_handlers;
+
+typedef struct {
+    TSTree *tree;
+    zend_object std;
+} php_treesitter_tree_object;
+
+static inline php_treesitter_tree_object *php_treesitter_tree_object_from_zend_object(zend_object *obj) {
+    return (php_treesitter_tree_object *)((char *)obj - XtOffsetOf(php_treesitter_tree_object, std));
+}
+
+static zend_object *php_treesitter_tree_object_create(zend_class_entry *ce)
+{
+    php_treesitter_tree_object *obj = zend_object_alloc(sizeof(php_treesitter_tree_object), ce);
+
+    zend_object_std_init(&obj->std, ce);
+    object_properties_init(&obj->std, ce);
+
+    return &obj->std;
+}
+
+ZEND_METHOD(TreeSitter_Tree, __construct)
+{
+    zend_throw_error(NULL, "%s class is non-instantiable", ZSTR_VAL(Z_OBJCE_P(ZEND_THIS)->name));
+    RETURN_THROWS();
+}
+
+ZEND_METHOD(TreeSitter_Tree, getRootNode)
+{
+    php_treesitter_tree_object *tree = php_treesitter_tree_object_from_zend_object(Z_OBJ_P(ZEND_THIS));
+
+    ZEND_PARSE_PARAMETERS_NONE();
+
+    object_init_ex(return_value, php_treesitter_node_ce);
+    php_treesitter_node_object *node = php_treesitter_node_object_from_zend_object(Z_OBJ_P(return_value));
+
+    node->node = ts_tree_root_node(tree->tree);
+}
+
+static zend_class_entry *php_treesitter_parser_ce = NULL;
+static zend_object_handlers php_treesitter_parser_handlers;
+
+typedef struct {
+    TSParser *parser;
+    const TSLanguage *grammar;
+    zend_object std;
+} php_treesitter_parser_object;
+
+static inline php_treesitter_parser_object *php_treesitter_parser_object_from_zend_object(zend_object *obj) {
+    return (php_treesitter_parser_object *)((char *)obj - XtOffsetOf(php_treesitter_parser_object, std));
 }
 
 static zend_object *php_treesitter_parser_object_create(zend_class_entry *ce)
@@ -52,14 +127,9 @@ static zend_object *php_treesitter_parser_object_create(zend_class_entry *ce)
     return &obj->std;
 }
 
-ZEND_METHOD(TreeSitter_Grammar, __construct)
-{
-    zend_throw_error(NULL, "%s class is non-instantiable", ZSTR_VAL(Z_OBJCE_P(ZEND_THIS)->name));
-    RETURN_THROWS();
-}
-
 ZEND_METHOD(TreeSitter_Parser, __construct)
 {
+    // TODO: should grammar be an enum class instead?
     zval *grammar;
 
     ZEND_PARSE_PARAMETERS_START(1, 1)
@@ -108,39 +178,15 @@ ZEND_METHOD(TreeSitter_Parser, parse)
         Z_PARAM_STR(source_code)
     ZEND_PARSE_PARAMETERS_END();
 
-    TSTree *tree = ts_parser_parse_string(
+    object_init_ex(return_value, php_treesitter_tree_ce);
+    php_treesitter_tree_object *tree = php_treesitter_tree_object_from_zend_object(Z_OBJ_P(return_value));
+
+    tree->tree = ts_parser_parse_string(
         parser->parser,
         NULL,
         ZSTR_VAL(source_code),
         ZSTR_LEN(source_code)
     );
-
-    // Get the root node of the syntax tree.
-    TSNode root_node = ts_tree_root_node(tree);
-
-    // Get some child nodes.
-    TSNode array_node = ts_node_named_child(root_node, 0);
-    TSNode number_node = ts_node_named_child(array_node, 0);
-
-    // Check that the nodes have the expected types.
-    assert(strcmp(ts_node_type(root_node), "document") == 0);
-    assert(strcmp(ts_node_type(array_node), "array") == 0);
-    assert(strcmp(ts_node_type(number_node), "number") == 0);
-
-    // Check that the nodes have the expected child counts.
-    assert(ts_node_child_count(root_node) == 1);
-    assert(ts_node_child_count(array_node) == 5);
-    assert(ts_node_named_child_count(array_node) == 2);
-    assert(ts_node_child_count(number_node) == 0);
-
-    // Print the syntax tree as an S-expression.
-    char *string = ts_node_string(root_node);
-    php_printf("Syntax tree: %s\n", string);
-
-    // Free all of the heap-allocated memory.
-    free(string);
-    ts_tree_delete(tree);
-    ts_parser_delete(parser->parser); // TODO: free on object deletion
 }
 
 PHP_MINIT_FUNCTION(treesitter)
@@ -156,7 +202,17 @@ PHP_MINIT_FUNCTION(treesitter)
 
     memcpy(&php_treesitter_parser_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 
-    // TODO: tree, node
+    php_treesitter_tree_ce = register_class_TreeSitter_Tree();
+    php_treesitter_tree_ce->create_object = php_treesitter_tree_object_create;
+
+    memcpy(&php_treesitter_tree_handlers, &std_object_handlers, sizeof(zend_object_handlers));
+    php_treesitter_grammar_handlers.clone_obj = NULL;
+
+    php_treesitter_node_ce = register_class_TreeSitter_Node();
+    php_treesitter_node_ce->create_object = php_treesitter_node_object_create;
+
+    memcpy(&php_treesitter_node_handlers, &std_object_handlers, sizeof(zend_object_handlers));
+    php_treesitter_grammar_handlers.clone_obj = NULL;
 
     return SUCCESS;
 }

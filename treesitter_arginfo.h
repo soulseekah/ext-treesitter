@@ -1,5 +1,5 @@
 /* This is a generated file, edit the .stub.php file instead.
- * Stub hash: aef0141b733f4fdc5f965fd9d128c52a10d3efa8 */
+ * Stub hash: 9470a3eda5ae3ec63b328be78f0b2a8b6486e95b */
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_TreeSitter_Grammar___construct, 0, 0, 0)
 ZEND_END_ARG_INFO()
@@ -12,10 +12,18 @@ ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_class_TreeSitter_Parser_parse, 0,
 	ZEND_ARG_TYPE_INFO(0, source_code, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_class_TreeSitter_Tree_getRootNode, 0, 0, TreeSitter\\\116ode, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_class_TreeSitter_Node___toString, 0, 0, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
 
 ZEND_METHOD(TreeSitter_Grammar, __construct);
 ZEND_METHOD(TreeSitter_Parser, __construct);
 ZEND_METHOD(TreeSitter_Parser, parse);
+ZEND_METHOD(TreeSitter_Tree, getRootNode);
+ZEND_METHOD(TreeSitter_Node, __toString);
 
 
 static const zend_function_entry class_TreeSitter_Grammar_methods[] = {
@@ -32,11 +40,13 @@ static const zend_function_entry class_TreeSitter_Parser_methods[] = {
 
 
 static const zend_function_entry class_TreeSitter_Tree_methods[] = {
+	ZEND_ME(TreeSitter_Tree, getRootNode, arginfo_class_TreeSitter_Tree_getRootNode, ZEND_ACC_PUBLIC)
 	ZEND_FE_END
 };
 
 
 static const zend_function_entry class_TreeSitter_Node_methods[] = {
+	ZEND_ME(TreeSitter_Node, __toString, arginfo_class_TreeSitter_Node___toString, ZEND_ACC_PUBLIC)
 	ZEND_FE_END
 };
 
