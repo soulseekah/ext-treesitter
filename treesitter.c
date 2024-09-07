@@ -4,6 +4,28 @@
 #include "lib/parsers/parsers.h"
 #include "treesitter_arginfo.h"
 
+/**
+ * TODO
+ *
+ * To implement core:
+ *    - ts_node_named_child
+ *    - ts_node_is_named
+ *    - ts_node_start_byte
+ *    - ts_node_end_byte
+ *    - ts_node_start_point
+ *    - ts_node_end_point
+ *  - ts_node_child
+ *  - ts_node_next_sibling
+ *  - ts_node_prev_sibling
+ *  - ts_node_parent
+ *  - ts_node_is_null
+ *
+ * To implement query:
+ *
+ *    - ts_query_new
+ *    - ...
+ */
+
 static zend_class_entry *php_treesitter_grammar_ce = NULL;
 static zend_object_handlers php_treesitter_grammar_handlers;
 
@@ -24,6 +46,30 @@ ZEND_METHOD(TreeSitter_Grammar, __construct)
 }
 
 static void php_treesitter_grammar_object_free(zend_object *obj)
+{
+    zend_object_std_dtor(obj);
+}
+
+static zend_class_entry *php_treesitter_point_ce = NULL;
+static zend_object_handlers php_treesitter_point_handlers;
+
+static zend_object *php_treesitter_point_object_create(zend_class_entry *ce)
+{
+    zend_object *php_treesitter_point_object = zend_object_alloc(sizeof(zend_object), ce);
+
+    zend_object_std_init(php_treesitter_point_object, ce);
+    object_properties_init(php_treesitter_point_object, ce);
+
+    return php_treesitter_point_object;
+}
+
+ZEND_METHOD(TreeSitter_Point, __construct)
+{
+    zend_throw_error(NULL, "%s class is non-instantiable", ZSTR_VAL(Z_OBJCE_P(ZEND_THIS)->name));
+    RETURN_THROWS();
+}
+
+static void php_treesitter_point_object_free(zend_object *obj)
 {
     zend_object_std_dtor(obj);
 }
@@ -54,6 +100,68 @@ ZEND_METHOD(TreeSitter_Node, __construct)
 {
     zend_throw_error(NULL, "%s class is non-instantiable", ZSTR_VAL(Z_OBJCE_P(ZEND_THIS)->name));
     RETURN_THROWS();
+}
+
+ZEND_METHOD(TreeSitter_Node, hasChildren)
+{
+    php_treesitter_node_object *node = php_treesitter_node_object_from_zend_object(Z_OBJ_P(ZEND_THIS));
+
+    ZVAL_BOOL(return_value, ts_node_child_count(node->node) > 0);
+}
+
+ZEND_METHOD(TreeSitter_Node, countChildren)
+{
+    php_treesitter_node_object *node = php_treesitter_node_object_from_zend_object(Z_OBJ_P(ZEND_THIS));
+
+    ZVAL_LONG(return_value, ts_node_child_count(node->node));
+}
+
+ZEND_METHOD(TreeSitter_Node, getType)
+{
+    php_treesitter_node_object *node = php_treesitter_node_object_from_zend_object(Z_OBJ_P(ZEND_THIS));
+
+    const char *type = ts_node_type(node->node);
+
+    zend_string *return_string = zend_string_init(type, strlen(type), 0);
+    RETURN_NEW_STR(return_string);
+}
+
+ZEND_METHOD(TreeSitter_Node, getStartByte)
+{
+    php_treesitter_node_object *node = php_treesitter_node_object_from_zend_object(Z_OBJ_P(ZEND_THIS));
+
+    ZVAL_LONG(return_value, ts_node_start_byte(node->node));
+}
+
+ZEND_METHOD(TreeSitter_Node, getEndByte)
+{
+    php_treesitter_node_object *node = php_treesitter_node_object_from_zend_object(Z_OBJ_P(ZEND_THIS));
+
+    ZVAL_LONG(return_value, ts_node_end_byte(node->node));
+}
+
+ZEND_METHOD(TreeSitter_Node, getStartPoint)
+{
+    php_treesitter_node_object *node = php_treesitter_node_object_from_zend_object(Z_OBJ_P(ZEND_THIS));
+
+    TSPoint point = ts_node_start_point(node->node);
+
+    object_init_ex(return_value, php_treesitter_point_ce);
+
+	add_property_long(return_value, "row", point.row);
+	add_property_long(return_value, "column", point.column);
+}
+
+ZEND_METHOD(TreeSitter_Node, getEndPoint)
+{
+    php_treesitter_node_object *node = php_treesitter_node_object_from_zend_object(Z_OBJ_P(ZEND_THIS));
+
+    TSPoint point = ts_node_end_point(node->node);
+
+    object_init_ex(return_value, php_treesitter_point_ce);
+
+	add_property_long(return_value, "row", point.row);
+	add_property_long(return_value, "column", point.column);
 }
 
 ZEND_METHOD(TreeSitter_Node, __toString)
@@ -108,6 +216,7 @@ ZEND_METHOD(TreeSitter_Tree, getRootNode)
     ZEND_PARSE_PARAMETERS_NONE();
 
     object_init_ex(return_value, php_treesitter_node_ce);
+
     php_treesitter_node_object *node = php_treesitter_node_object_from_zend_object(Z_OBJ_P(return_value));
 
     node->node = ts_tree_root_node(tree->tree);
@@ -259,6 +368,15 @@ PHP_MINIT_FUNCTION(treesitter)
     php_treesitter_node_handlers.free_obj = php_treesitter_node_object_free;
     php_treesitter_node_handlers.compare = zend_objects_not_comparable;
     php_treesitter_node_handlers.clone_obj = NULL;
+
+    php_treesitter_point_ce = register_class_TreeSitter_Point();
+    php_treesitter_point_ce->default_object_handlers = &php_treesitter_point_handlers;
+    php_treesitter_point_ce->create_object = php_treesitter_point_object_create;
+
+    memcpy(&php_treesitter_point_handlers, &std_object_handlers, sizeof(zend_object_handlers));
+    php_treesitter_point_handlers.free_obj = php_treesitter_point_object_free;
+    php_treesitter_point_handlers.compare = zend_objects_not_comparable; // TODO: should be, though :D
+    php_treesitter_point_handlers.clone_obj = NULL;
 
     return SUCCESS;
 }

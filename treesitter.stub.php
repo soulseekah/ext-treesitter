@@ -50,7 +50,7 @@ namespace TreeSitter {
 	 * @strict-properties
 	 * @not-serializable
 	 */
-	class Parser {
+	final class Parser {
 		public function __construct(int $grammar) {}
 
 		public function parse(string $source_code): Tree {}
@@ -60,7 +60,7 @@ namespace TreeSitter {
 	 * @strict-properties
 	 * @not-serializable
 	 */
-	class Tree {
+	final class Tree {
 		public function getRootNode(): Node {}
 	}
 
@@ -68,7 +68,34 @@ namespace TreeSitter {
 	 * @strict-properties
 	 * @not-serializable
 	 */
-	class Node {
+	final class Node {
+		public function getType(): string {}
+
+		public function hasChildren(): bool {}
+
+		public function countChildren(): int {}
+
+		public function getStartByte(): int {}
+
+		public function getEndByte(): int {}
+
+		public function getStartPoint(): Point {}
+
+		public function getEndPoint(): Point {}
+
 		public function __toString(): string {}
+	}
+
+	/**
+	 * @strict-properties
+	 * @not-serializable
+	 */
+	final class Point {
+		public int $row;
+
+		public int $column;
+	}
+
+	final class SyntaxError extends Exception {
 	}
 }
